@@ -109,7 +109,7 @@ export default function MainApp() {
       <SidebarMobileNavProvider>
         <div
           data-testid="root-layout"
-          className="h-screen min-h-0 min-w-0 flex flex-row bg-base overflow-hidden p-0"
+          className="h-screen min-h-0 min-w-0 flex flex-col md:flex-row bg-base overflow-hidden p-0"
         >
           <title>{appTitle}</title>
           <Sidebar />

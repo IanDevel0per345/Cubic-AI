@@ -81,7 +81,7 @@ export function Sidebar({
       data-state={state}
       aria-label="Cubic AI navigation"
       className={cn(
-        "flex h-full min-h-0 shrink-0 flex-col self-start border-r border-[var(--oh-border)] bg-base text-white transition-[width] duration-200",
+        "hidden h-full min-h-0 shrink-0 flex-col self-start border-r border-[var(--oh-border)] bg-base text-white transition-[width] duration-200 md:flex",
         open ? "w-[272px]" : "w-[68px]",
         className,
       )}
