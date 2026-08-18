@@ -109,12 +109,12 @@ export default function MainApp() {
       <SidebarMobileNavProvider>
         <div
           data-testid="root-layout"
-          className="h-screen lg:min-w-5xl flex flex-col md:flex-row bg-base overflow-hidden p-0"
+          className="h-screen min-h-0 min-w-0 flex flex-row bg-base overflow-hidden p-0"
         >
           <title>{appTitle}</title>
           <Sidebar />
 
-          <div className="flex min-h-0 flex-col w-full min-w-0 h-full gap-3">
+          <div className="flex min-h-0 min-w-0 flex-1 flex-col h-full gap-3">
             {!hideMobileSidebarMenuBar ? <SidebarMobileMenuBar /> : null}
             {config.data &&
               (config.data.maintenance_start_time ||

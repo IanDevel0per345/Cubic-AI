@@ -63,7 +63,7 @@ export function SidebarProvider({
 
   return (
     <SidebarContext.Provider value={value}>
-      <div className={cn("group/sidebar-wrapper flex min-h-0 h-full", className)}>
+      <div className={cn("group/sidebar-wrapper flex h-full min-h-0 min-w-0", className)}>
         {children}
       </div>
     </SidebarContext.Provider>
@@ -81,7 +81,7 @@ export function Sidebar({
       data-state={state}
       aria-label="Cubic AI navigation"
       className={cn(
-        "hidden md:flex h-full shrink-0 flex-col border-r border-[var(--oh-border)] bg-base text-white transition-[width] duration-200",
+        "flex h-full min-h-0 shrink-0 flex-col self-start border-r border-[var(--oh-border)] bg-base text-white transition-[width] duration-200",
         open ? "w-[272px]" : "w-[68px]",
         className,
       )}
