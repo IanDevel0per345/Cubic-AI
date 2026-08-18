@@ -28,8 +28,6 @@ import { getWorkspacesUnsupportedMessage } from "#/utils/workspaces-compatibilit
 import type { PluginSpec } from "#/api/conversation-service/agent-server-conversation-service.types";
 import { PluginPickerModal } from "#/components/features/plugins/plugin-picker-modal";
 import { PluginPickerTrigger } from "#/components/features/plugins/plugin-picker-trigger";
-import { PinnedAutomationsDashboard } from "./featured-automations/pinned-automations-dashboard";
-import { RunningAutomationsList } from "./featured-automations/running-automations-list";
 import { HomeHeaderTitle } from "./home-header/home-header-title";
 import { OpenLauncherButton } from "./open-launcher-button";
 import { OpenWorkspaceDialog } from "./open-workspace-dialog";
@@ -259,11 +257,6 @@ export function HomeChatLauncher() {
             onClick={() => setIsPluginPickerOpen(true)}
             disabled={isCreating}
           />
-        </div>
-
-        <div className="mt-8 flex w-full flex-col gap-8">
-          <PinnedAutomationsDashboard />
-          <RunningAutomationsList />
         </div>
       </div>
 

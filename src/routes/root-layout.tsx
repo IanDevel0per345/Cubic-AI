@@ -15,7 +15,6 @@ import { SidebarMobileMenuBar } from "#/components/features/sidebar/sidebar-mobi
 import { useSettings } from "#/hooks/query/use-settings";
 import { useEnsureActiveProfile } from "#/hooks/use-ensure-active-profile";
 import { useSyncTelemetryConsent } from "#/hooks/use-sync-telemetry-consent";
-import { useSyncAutomationTelemetryConsent } from "#/hooks/use-sync-automation-telemetry-consent";
 
 import { useTelemetryIdentity } from "#/hooks/use-telemetry-identity";
 import { LoadingSpinner } from "#/components/shared/loading-spinner";
@@ -78,8 +77,6 @@ export default function MainApp() {
   const companyManagedFrontend = isCompanyManagedFrontend();
   const { data: settings } = useSettings();
   const config = useConfig({ enabled: !companyManagedFrontend });
-
-  useSyncAutomationTelemetryConsent();
 
   useSyncTelemetryConsent();
   useTelemetryIdentity();
