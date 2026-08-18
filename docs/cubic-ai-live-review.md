@@ -41,3 +41,7 @@ O modal antigo não aparece: não há `Add a backend`, campos `Host`, `Host URL`
 ## Revisão local atual após a correção do OnboardingHost
 
 Em 18 de agosto de 2026, a prévia limpa em `http://127.0.0.1:4173/` exibiu `Cubic AI`, o wordmark `Cubic`, `New legal matter`, `Legal resources`, `Automate` e `Your legal work, with an AI built for attorneys`. A tela entrou diretamente no workspace jurídico, sem `Add a backend`, `Host`, `API Key`, `OpenHands Cloud`, `Connect to OpenHands` ou etapas de onboarding. A build e o typecheck passaram após a remoção do `OnboardingHost` de `src/routes/home.tsx`.
+
+## Revisão do sidebar do TXT — 18 de agosto de 2026
+
+A versão publicada no alias `https://cubic-ai-psi.vercel.app/` foi revisada após o deploy `7R4fGQE5MJWxzRijJrVHWDRUcd3u`. A home exibe o logo Cubic, os itens `Home`, `Matters`, `Documents`, `Calendar`, `Search` e `Settings`, além do perfil `Cubic AI — Legal workspace`. O item `Automate` não aparece, os dashboards de automação foram removidos da home e as rotas de automação foram retiradas do mapa do React Router. A chamada jurídica `Your legal work, with an AI built for attorneys` permanece visível.
