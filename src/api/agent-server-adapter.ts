@@ -107,7 +107,8 @@ const BROWSER_TOOL_SET_NAME = "browser_tool_set";
 const TASK_TOOL_SET_NAME = "task_tool_set";
 
 function browserToolsEnabled() {
-  return import.meta.env.VITE_ENABLE_BROWSER_TOOLS !== "false";
+  // Computer-use is intentionally opt-in for Cubic AI's legal workspace.
+  return import.meta.env.VITE_ENABLE_BROWSER_TOOLS === "true";
 }
 
 /**

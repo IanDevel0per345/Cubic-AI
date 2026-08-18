@@ -21,10 +21,8 @@ import {
   isAgentServerAuthError,
 } from "#/api/agent-server-compatibility";
 import {
-  getLockedCloudAuthMode,
   getLockedCloudHost,
-  isAuthRequiredAndMissing,
-  isSameCloudHost,
+  isCompanyManagedFrontend,
 } from "#/api/agent-server-config";
 import {
   authenticateWithMainAppCookie,
@@ -45,7 +43,6 @@ import { QUERY_KEYS } from "#/hooks/query/query-keys";
 import { AgentServerUIRoot } from "#/components/providers";
 import { TelemetryConsentBanner } from "#/components/features/analytics/telemetry-consent-banner";
 import { buildAgentCanvasPath } from "#/utils/base-path";
-import { useOnboardingCompletion } from "#/components/features/onboarding/use-onboarding-completion";
 import { NavigationProvider } from "#/context/navigation-context";
 import {
   applyColorTheme,
@@ -91,7 +88,7 @@ const BackendFormModal = React.lazy(() =>
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="pt-BR">
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -222,69 +219,26 @@ export const links: LinksFunction = () => [
 ];
 
 export const meta: MetaFunction = () => [
-  { title: "OpenHands" },
-  { name: "description", content: "Let's Start Building!" },
+  { title: "Cubic AI" },
+  {
+    name: "description",
+    content:
+      "Workspace jurídico com inteligência artificial para pesquisa, análise e elaboração de documentos.",
+  },
 ];
 
 export default function App() {
-  // Flag-based gate: in public mode (VITE_AUTH_REQUIRED=true) with no
-  // session key yet, show the auth screen immediately — no network
-  // round-trip needed.
-  //
-  // `isAuthRequiredAndMissing()` only checks for a *baked-in* session
-  // key (env var / window global). In public mode the baked key is
-  // intentionally absent — the user enters it through the auth screen,
-  // which persists it to the backend registry (localStorage). After a
-  // reload the baked key is still null, but the registry has the key.
-  // So: skip the instant gate when a registered backend already carries
-  // an API key — let the normal /server_info probe validate it instead.
-  const bakedKeyMissing = isAuthRequiredAndMissing();
-  const hasRegisteredKey = Boolean(getEffectiveLocalBackend()?.apiKey);
-  const authMissing = bakedKeyMissing && !hasRegisteredKey;
-  const { active } = useActiveBackendContext();
-  // In locked-to-Cloud mode the only valid backend is a Cloud backend whose
-  // host matches the configured locked Cloud host. A missing backend, a stale
-  // Local backend (e.g. one persisted from a previous non-locked session), or
-  // a Cloud backend pointing at a *different* host must all trigger first-run
-  // onboarding instead of the Manage Backends recovery modal — the onboarding
-  // flow owns the Cloud login that replaces the stale backend.
-  const lockedCloudHost = getLockedCloudHost();
-  const lockedCloudAuthMode = getLockedCloudAuthMode();
-  const isLockedToCloud = lockedCloudHost !== null;
-  // True only when the active backend IS the configured locked Cloud host
-  // (normalized comparison so trailing slash / case / protocol differences
-  // don't cause false negatives). This is the single signal the locked-mode
-  // gates key off of: a reachable stale Local backend or a Cloud backend on
-  // another host must never be treated as the locked backend.
-  const isActiveLockedCloudBackend =
-    isLockedToCloud &&
-    active.backend.kind === "cloud" &&
-    isSameCloudHost(active.backend.host, lockedCloudHost);
-  const { isCompleted: onboardingCompleted, markCompleted } =
-    useOnboardingCompletion();
+  const companyManagedFrontend = isCompanyManagedFrontend();
 
-  // In locked-to-Cloud mode the `openhands-onboarded` localStorage flag is
-  // not trustworthy: it may have been set during a previous non-locked
-  // session on the same origin, and origin-scoped localStorage cannot tell
-  // the two deployments apart. So when the active backend is not the locked
-  // Cloud host we ignore the completion flag and force first-run onboarding
-  // (which owns the Cloud login). A stale completion flag must never strand
-  // the user on the Manage Backends recovery modal ("Add Backend") in locked
-  // mode.
-  //
-  // Once the active backend IS the locked Cloud host, a Cloud login that
-  // just succeeded (markCompleted fired via the onboarding modal's onClose)
-  // must hide first-run onboarding immediately. Treating
-  // `onboardingCompleted` as authoritative once the locked Cloud backend is
-  // active suppresses reopen flicker. (The flag is only honored when the
-  // active backend really is the locked Cloud host, so the stale-flag bypass
-  // concerns above don't apply here.)
-  const shouldCheckMainAppAuth = shouldUseMainAppCookieAuth();
-  const showFirstRunOnboarding = isLockedToCloud
-    ? !shouldCheckMainAppAuth &&
-      (!isActiveLockedCloudBackend ||
-        (lockedCloudAuthMode !== "cookie" && !onboardingCompleted))
-    : !onboardingCompleted;
+  // The public Cubic AI product owns its agent connection; users never enter
+  // backend credentials in this frontend.
+  const authMissing = false;
+  const { active } = useActiveBackendContext();
+  const shouldCheckMainAppAuth =
+    !companyManagedFrontend && shouldUseMainAppCookieAuth();
+  // The legacy onboarding remains in the codebase for internal/local builds,
+  // but is never mounted by the public company-owned product.
+  const showFirstRunOnboarding = false;
   const mainAppAuth = useQuery({
     queryKey: QUERY_KEYS.MAIN_APP_COOKIE_AUTH,
     queryFn: authenticateWithMainAppCookie,
@@ -313,12 +267,15 @@ export default function App() {
   // collection; the onboarding steps issue their own backend-specific queries.
   const config = useConfig({
     enabled:
+      !companyManagedFrontend &&
       !authMissing &&
       !showFirstRunOnboarding &&
       mainAppAuthAllowsBackendQueries,
   });
   const activeCloudHealth = useBackendsHealth(
-    active.backend.kind === "cloud" && mainAppAuthAllowsBackendQueries
+    !companyManagedFrontend &&
+      active.backend.kind === "cloud" &&
+      mainAppAuthAllowsBackendQueries
       ? [active.backend]
       : [],
   )[active.backend.id];
@@ -339,7 +296,7 @@ export default function App() {
   if (showFirstRunOnboarding) {
     return (
       <>
-        <FirstRunOnboardingScreen onClose={markCompleted} />
+        <FirstRunOnboardingScreen onClose={() => undefined} />
         <TelemetryConsentBanner />
       </>
     );
@@ -359,14 +316,15 @@ export default function App() {
     );
   }
 
-  if (config.isPending || config.isLoading) {
+  if (!companyManagedFrontend && (config.isPending || config.isLoading)) {
     return <AgentServerBootstrapLoading />;
   }
 
   if (
-    activeCloudLoggedOut ||
-    activeCloudUnreachable ||
-    isAgentServerUnavailableError(config.error)
+    !companyManagedFrontend &&
+    (activeCloudLoggedOut ||
+      activeCloudUnreachable ||
+      isAgentServerUnavailableError(config.error))
   ) {
     return <MissingAgentServerScreen />;
   }

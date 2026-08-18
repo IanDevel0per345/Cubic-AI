@@ -23,6 +23,7 @@ import { useAppTitle } from "#/hooks/use-app-title";
 import { ReactRouterNavigationProvider } from "./react-router-navigation-provider";
 import { OnboardingHost } from "#/components/features/onboarding";
 import { isOnboardingPreviewActive } from "#/components/features/onboarding/onboarding-preview";
+import { isCompanyManagedFrontend } from "#/api/agent-server-config";
 
 const EnvironmentSwitchOverlay = React.lazy(
   () => import("#/components/features/backends/environment-switch-overlay"),
@@ -74,8 +75,9 @@ export function ErrorBoundary() {
 export default function MainApp() {
   const location = useLocation();
   const appTitle = useAppTitle();
+  const companyManagedFrontend = isCompanyManagedFrontend();
   const { data: settings } = useSettings();
-  const config = useConfig();
+  const config = useConfig({ enabled: !companyManagedFrontend });
 
   useSyncAutomationTelemetryConsent();
 
@@ -90,7 +92,7 @@ export default function MainApp() {
     }
   }, [settings?.language]);
 
-  if (config.isLoading) {
+  if (!companyManagedFrontend && config.isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-base">
         <LoadingSpinner size="large" />

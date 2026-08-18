@@ -100,6 +100,14 @@ function getConfiguredBaseUrl(): string | null {
 }
 
 /**
+ * Cubic AI is a company-owned product. The public frontend must never ask the
+ * user to provide a backend host, API key, or local agent-server connection.
+ */
+export function isCompanyManagedFrontend(): boolean {
+  return true;
+}
+
+/**
  * Return the session API key supplied by the deployment host.
  *
  * Two sources are consulted, in order:

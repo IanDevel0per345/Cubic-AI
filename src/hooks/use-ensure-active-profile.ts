@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { useActiveBackend } from "#/contexts/active-backend-context";
 import { useLlmProfiles } from "#/hooks/query/use-llm-profiles";
 import { useActivateLlmProfile } from "#/hooks/mutation/use-activate-llm-profile";
+import { isCompanyManagedFrontend } from "#/api/agent-server-config";
 
 /**
  * Local-mode UX policy: keep an LLM profile active whenever at least one
@@ -18,7 +19,9 @@ import { useActivateLlmProfile } from "#/hooks/mutation/use-activate-llm-profile
 export function useEnsureActiveProfile(): void {
   const { backend } = useActiveBackend();
   const isLocal = backend.kind === "local";
-  const { data: profilesData } = useLlmProfiles();
+  const { data: profilesData } = useLlmProfiles({
+    enabled: !isCompanyManagedFrontend(),
+  });
   const { mutate: activate, isPending } = useActivateLlmProfile();
 
   // Remember the last profile we tried to activate so we don't re-fire while
